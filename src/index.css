@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'TT Norms Pro';
+  src: url('/fonts/tt-norms-pro-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Norms Pro';
+  src: url('/fonts/tt-norms-pro-semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+    background-color: #0C0C0C;
+  }
+
+  body, #root {
+    background-color: #0C0C0C;
+    color: #F5F7FA;
+    font-family: 'Kanit', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #08090B;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1F2937;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #374151;
+  }
+}
+
+@layer components {
+  /* Tactical Glassmorphism */
+  .glass-surface {
+    background: rgba(18, 24, 32, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .glass-surface-hover {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-surface-hover:hover {
+    background: rgba(24, 33, 43, 0.8);
+    border-color: rgba(125, 231, 255, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .glass-badge {
+    background: rgba(125, 231, 255, 0.08);
+    border: 1px solid rgba(125, 231, 255, 0.2);
+    backdrop-filter: blur(8px);
+  }
+
+  .glass-input {
+    background: rgba(13, 17, 23, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+  }
+  .glass-input:focus {
+    border-color: #7DE7FF;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(125, 231, 255, 0.2);
+  }
+
+  /* Text gradient utility */
+  .text-gradient-cyan {
+    background: linear-gradient(135deg, #FFFFFF 20%, #7DE7FF 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-warm {
+    background: linear-gradient(135deg, #FFB26B 0%, #FF7A3D 50%, #D96B27 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-hybrid {
+    background: linear-gradient(135deg, #FFFFFF 0%, #C9F3FF 40%, #7DE7FF 70%, #FF7A3D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Ultra-Clear High-Contrast Luminous Editorial Gradient */
+  .hero-heading, .hero-title {
+    background: linear-gradient(180deg, #FFFFFF 10%, #E8F1F8 55%, #A1B6C7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 30px rgba(255, 255, 255, 0.15));
+  }
+
+  .hero-heading-glow {
+    text-shadow: 0 0 35px rgba(125, 231, 255, 0.25);
+  }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
