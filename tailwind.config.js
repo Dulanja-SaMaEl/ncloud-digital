@@ -11,7 +11,8 @@ export default {
         kanit: ['Kanit', 'sans-serif'],
         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
         heading: ['Outfit', 'sans-serif'],
-        mono: ['"Space Grotesk"', 'monospace'],
+        serif: ['"Instrument Serif"', '"Playfair Display"', 'Georgia', 'serif'],
+        editorial: ['"Instrument Serif"', '"Playfair Display"', 'serif'],
         'tt-norms': ['"TT Norms Pro"', 'system-ui', 'sans-serif'],
       },
       colors: {
