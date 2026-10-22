@@ -27,7 +27,7 @@ export const GrowthCore3D: React.FC<GrowthCore3DProps> = ({ className = '', inte
       return;
     }
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion = false;
 
     // Dimensions
     let width = container.clientWidth || 450;

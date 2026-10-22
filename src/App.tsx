@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import JackPortfolio from './components/JackPortfolio/JackPortfolio';
 import HaloLanding from './components/HaloLanding/HaloLanding';
 import MedianStudio from './components/MedianStudio/MedianStudio';
@@ -1730,6 +1730,7 @@ export default function App() {
 
   const switchView = (view: 'jack' | 'ncloud' | 'halo' | 'median') => {
     setActiveView(view);
+    window.scrollTo({ top: 0 });
     const url = new URL(window.location.href);
     if (view === 'ncloud') {
       url.searchParams.delete('view');
@@ -1741,7 +1742,7 @@ export default function App() {
   };
 
   return (
-    <>
+    <MotionConfig reducedMotion="never">
       {/* Portfolio / Project Switcher Floating Badge */}
       <aside
         aria-label="Portfolio Switcher"
@@ -1790,7 +1791,7 @@ export default function App() {
       </aside>
 
       {activeView === 'median' ? (
-        <MedianStudio onSwitchView={setActiveView} />
+        <MedianStudio onSwitchView={switchView} />
       ) : activeView === 'halo' ? (
         <HaloLanding />
       ) : activeView === 'jack' ? (
@@ -1799,7 +1800,7 @@ export default function App() {
         <div className="bg-[#08090B] min-h-screen text-[#F5F7FA] font-sans antialiased overflow-x-hidden selection:bg-cyan-400/30 selection:text-cyan-300">
           <Navbar
             onOpenClientHub={() => setClientHubOpen(true)}
-            onSwitchToMedian={() => setActiveView('median')}
+            onSwitchToMedian={() => switchView('median')}
           />
           
           <main>
@@ -1820,6 +1821,6 @@ export default function App() {
           <ClientHubModal isOpen={clientHubOpen} onClose={() => setClientHubOpen(false)} />
         </div>
       )}
-    </>
+    </MotionConfig>
   );
 }

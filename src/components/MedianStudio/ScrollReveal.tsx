@@ -40,7 +40,6 @@ const activeEvaluators = new Set<() => void>();
 let cascadeTimers: number[] = [];
 
 function triggerCascadeReevaluation() {
-  // Immediately notify nested children in the next microtask/frame, plus follow-up ticks
   queueMicrotask(() => {
     activeEvaluators.forEach((fn) => fn());
   });
@@ -48,7 +47,7 @@ function triggerCascadeReevaluation() {
     activeEvaluators.forEach((fn) => fn());
   });
   cascadeTimers.forEach((id) => window.clearTimeout(id));
-  cascadeTimers = [100, 260, 550, 950].map((ms) =>
+  cascadeTimers = [80, 220, 480, 850].map((ms) =>
     window.setTimeout(() => {
       activeEvaluators.forEach((fn) => fn());
     }, ms)
@@ -67,119 +66,10 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const innerRef = useRef<HTMLElement | null>(null);
+  const animRef = useRef<Animation | null>(null);
   const hasRevealedOnceRef = useRef(false);
   const isVisibleRef = useRef(false);
-
-  useEffect(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-
-    let raf1: number | null = null;
-    let raf2: number | null = null;
-    let isMountedAndPainted = false;
-
-    const isPreloaderActive = () => {
-      if (typeof window === 'undefined') return false;
-      if ((window.scrollY || window.pageYOffset) >= 10) return false;
-      const seen = sessionStorage.getItem('median_preloader_seen');
-      const done = (window as unknown as { __median_preloader_done?: boolean }).__median_preloader_done;
-      return !seen && !done;
-    };
-
-    const evaluateVisibility = () => {
-      if (!el || !isMountedAndPainted) return;
-      if (once && hasRevealedOnceRef.current) return;
-
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight || document.documentElement.clientHeight;
-      const docHeight = document.documentElement.scrollHeight;
-      const scrollBottom = (window.scrollY || window.pageYOffset) + vh;
-      const isAtPageBottom = scrollBottom >= docHeight - 60;
-
-      const ancestorReveal = el.parentElement?.closest('[data-scroll-reveal]');
-      const isAncestorVisible =
-        ancestorReveal?.getAttribute('data-reveal-state') === 'visible';
-
-      // Trigger when element is inside the human viewing zone (top 85% of viewport),
-      // when user has reached the very bottom of the page, OR when its parent card has entered view
-      const triggerLine = isAtPageBottom ? vh - 10 : vh * 0.85;
-      const isEnteringViewingZone =
-        (rect.top <= triggerLine && rect.bottom >= 30) || isAncestorVisible;
-
-      if (isEnteringViewingZone) {
-        if (isPreloaderActive() && rect.top < vh) {
-          return;
-        }
-        if (!isVisibleRef.current) {
-          hasRevealedOnceRef.current = true;
-          isVisibleRef.current = true;
-          setIsVisible(true);
-          triggerCascadeReevaluation();
-        }
-      } else if (!once) {
-        // Reset when element leaves the viewport so re-scrolling always plays the animation
-        if (!isAncestorVisible && (rect.top >= vh * 0.95 || rect.bottom <= -10)) {
-          if (isVisibleRef.current) {
-            isVisibleRef.current = false;
-            setIsVisible(false);
-          }
-        }
-      }
-    };
-
-    activeEvaluators.add(evaluateVisibility);
-
-    // Wait two animation frames so the browser paints the initial opacity:0 / displaced transform
-    // before transitioning to the active state
-    raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => {
-        isMountedAndPainted = true;
-        evaluateVisibility();
-      });
-    });
-
-    let ticking = false;
-    const onScrollOrResize = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          evaluateVisibility();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    const onPreloaderDone = () => {
-      requestAnimationFrame(() => {
-        evaluateVisibility();
-      });
-    };
-
-    let observer: IntersectionObserver | null = null;
-    if (typeof IntersectionObserver !== 'undefined') {
-      observer = new IntersectionObserver(
-        () => {
-          evaluateVisibility();
-        },
-        { threshold: [0, 0.1, 0.25, 0.5] }
-      );
-      observer.observe(el);
-    }
-
-    window.addEventListener('scroll', onScrollOrResize, { passive: true });
-    window.addEventListener('resize', onScrollOrResize, { passive: true });
-    window.addEventListener('median_preloader_done', onPreloaderDone);
-
-    return () => {
-      activeEvaluators.delete(evaluateVisibility);
-      if (raf1) cancelAnimationFrame(raf1);
-      if (raf2) cancelAnimationFrame(raf2);
-      if (observer) observer.disconnect();
-      window.removeEventListener('scroll', onScrollOrResize);
-      window.removeEventListener('resize', onScrollOrResize);
-      window.removeEventListener('median_preloader_done', onPreloaderDone);
-    };
-  }, [once]);
 
   // Initial (hidden) transform — bold, unmistakable spatial displacements
   const getInitialTransform = () => {
@@ -259,38 +149,236 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
     }
   };
 
-  const getFilter = () => {
-    if (variant === 'blur-focus') {
-      return isVisible ? 'blur(0px)' : 'blur(16px)';
-    }
-    if (variant === 'curtain-expand' || variant === 'card-lift') {
-      return isVisible ? 'blur(0px)' : 'blur(6px)';
+  const getInitialFilter = () => {
+    if (variant === 'blur-focus') return 'blur(16px)';
+    if (variant === 'curtain-expand' || variant === 'card-lift') return 'blur(6px)';
+    return undefined;
+  };
+
+  const getActiveFilter = () => {
+    if (variant === 'blur-focus' || variant === 'curtain-expand' || variant === 'card-lift') {
+      return 'blur(0px)';
     }
     return undefined;
   };
 
-  const getClipPath = () => {
-    if (variant === 'curtain-expand') {
-      return isVisible
-        ? 'inset(0% 0% 0% 0% round 16px)'
-        : 'inset(18% 14% 18% 14% round 24px)';
-    }
+  const getInitialClipPath = () => {
+    if (variant === 'curtain-expand') return 'inset(18% 14% 18% 14% round 24px)';
+    return undefined;
+  };
+
+  const getActiveClipPath = () => {
+    if (variant === 'curtain-expand') return 'inset(0% 0% 0% 0% round 16px)';
     return undefined;
   };
 
   const appliedDelay = isVisible ? Math.min(delay, 750) : 0;
-  const activeDuration = isVisible ? duration : 350;
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+  const activeDuration = isVisible ? (isDesktop ? Math.round(duration * 1.12) : duration) : 320;
 
   const easing =
     variant === 'counter-pop' || variant === 'badge-drop' || variant === 'zoom-rotate'
       ? 'cubic-bezier(0.34, 1.56, 0.64, 1)'
-      : 'cubic-bezier(0.25, 1, 0.5, 1)';
+      : 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+  // Drive explicit Web Animations API keyframes whenever visibility changes so PC browsers
+  // (including high-refresh monitors and reduced-motion OS settings) NEVER skip a frame.
+  useEffect(() => {
+    const innerEl = innerRef.current;
+    if (!innerEl || typeof innerEl.animate !== 'function') return;
+
+    if (isVisible) {
+      animRef.current?.cancel();
+      const fromFrame: Keyframe = {
+        opacity: 0,
+        transform: getInitialTransform(),
+      };
+      const toFrame: Keyframe = {
+        opacity: 1,
+        transform: getActiveTransform(),
+      };
+
+      const initFilter = getInitialFilter();
+      const actFilter = getActiveFilter();
+      if (initFilter && actFilter) {
+        fromFrame.filter = initFilter;
+        toFrame.filter = actFilter;
+      }
+
+      const initClip = getInitialClipPath();
+      const actClip = getActiveClipPath();
+      if (initClip && actClip) {
+        fromFrame.clipPath = initClip;
+        toFrame.clipPath = actClip;
+      }
+
+      animRef.current = innerEl.animate([fromFrame, toFrame], {
+        duration: activeDuration,
+        delay: appliedDelay,
+        easing,
+        fill: 'both',
+      });
+    } else {
+      if (animRef.current) {
+        animRef.current.cancel();
+        animRef.current = null;
+      }
+    }
+  }, [isVisible, variant]);
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+
+    let raf1: number | null = null;
+    let mountTimer: number | null = null;
+    let isMountedAndPainted = false;
+
+    const isPreloaderActive = () => {
+      if (typeof window === 'undefined') return false;
+      if ((window.scrollY || window.pageYOffset) >= 15) return false;
+      const seen = sessionStorage.getItem('median_preloader_seen');
+      const done = (window as unknown as { __median_preloader_done?: boolean }).__median_preloader_done;
+      return !seen && !done;
+    };
+
+    const evaluateVisibility = () => {
+      if (!el || !isMountedAndPainted) return;
+      if (once && hasRevealedOnceRef.current) return;
+
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const vw = window.innerWidth || document.documentElement.clientWidth;
+      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      const docHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+      const scrollBottom = scrollY + vh;
+      const remainingScroll = Math.max(0, docHeight - scrollBottom);
+
+      const ancestorReveal = el.parentElement?.closest('[data-scroll-reveal]');
+      const isAncestorVisible =
+        ancestorReveal?.getAttribute('data-reveal-state') === 'visible';
+
+      // Determine if element belongs to the initial top hero area
+      const docTop = rect.top + scrollY;
+      const isHeroElement = docTop < vh * 0.85;
+
+      // On PC (vw >= 768), 3-column grids make sections shorter than the monitor height.
+      // Use a tighter trigger zone (68% from top, plus a 22% element-entry offset) so sections
+      // only animate when they have actually scrolled into the user's line of sight on PC,
+      // while keeping Mobile (< 768px) at 85%.
+      const baseTriggerRatio = isHeroElement ? 0.92 : vw >= 768 ? 0.68 : 0.85;
+      let triggerLine = vh * baseTriggerRatio;
+
+      // Smoothly expand trigger line down to the bottom of the screen when approaching page bottom
+      if (remainingScroll < 360) {
+        const bottomFactor = 1 - remainingScroll / 360;
+        triggerLine = triggerLine + (vh - 8 - triggerLine) * bottomFactor;
+      }
+
+      // Require larger cards on PC to have at least 22% (up to 75px) inside the trigger line
+      const entryOffset =
+        !isHeroElement && vw >= 768 && !ancestorReveal
+          ? Math.min(rect.height * 0.22, 75)
+          : 0;
+
+      const isDirectInView =
+        rect.top + entryOffset <= triggerLine && rect.bottom >= 24;
+      const isChildInView =
+        isAncestorVisible && (rect.top <= vh * 0.90 || remainingScroll < 120);
+
+      const isEnteringViewingZone = isDirectInView || isChildInView;
+
+      if (isEnteringViewingZone) {
+        if (isPreloaderActive() && rect.top < vh) {
+          return;
+        }
+        if (!isVisibleRef.current) {
+          hasRevealedOnceRef.current = true;
+          isVisibleRef.current = true;
+          el.setAttribute('data-reveal-state', 'visible');
+          setIsVisible(true);
+          triggerCascadeReevaluation();
+        }
+      } else if (!once) {
+        // Reset when element leaves the viewport or when its parent card resets
+        const isOutBottom = rect.top >= (vw >= 768 ? vh * 0.90 : vh * 0.95);
+        const isOutTop = rect.bottom <= -10;
+        const isParentHidden = ancestorReveal !== null && !isAncestorVisible;
+
+        if (isOutBottom || isOutTop || isParentHidden) {
+          if (isVisibleRef.current) {
+            isVisibleRef.current = false;
+            el.setAttribute('data-reveal-state', 'hidden');
+            setIsVisible(false);
+            triggerCascadeReevaluation();
+          }
+        }
+      }
+    };
+
+    activeEvaluators.add(evaluateVisibility);
+
+    // Ensure initial hidden state is committed to DOM & GPU before evaluating visibility
+    mountTimer = window.setTimeout(() => {
+      raf1 = requestAnimationFrame(() => {
+        isMountedAndPainted = true;
+        evaluateVisibility();
+      });
+    }, 35);
+
+    let ticking = false;
+    const onScrollOrResize = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          evaluateVisibility();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    const onPreloaderDone = () => {
+      requestAnimationFrame(() => {
+        evaluateVisibility();
+      });
+    };
+
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver(
+        () => {
+          evaluateVisibility();
+        },
+        { threshold: [0, 0.05, 0.15, 0.3, 0.5, 0.75, 1] }
+      );
+      observer.observe(el);
+    }
+
+    window.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true });
+    document.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true });
+    window.addEventListener('resize', onScrollOrResize, { passive: true });
+    window.addEventListener('median_preloader_done', onPreloaderDone);
+
+    return () => {
+      activeEvaluators.delete(evaluateVisibility);
+      if (mountTimer) window.clearTimeout(mountTimer);
+      if (raf1) cancelAnimationFrame(raf1);
+      if (observer) observer.disconnect();
+      window.removeEventListener('scroll', onScrollOrResize, true);
+      document.removeEventListener('scroll', onScrollOrResize, true);
+      window.removeEventListener('resize', onScrollOrResize);
+      window.removeEventListener('median_preloader_done', onPreloaderDone);
+    };
+  }, [once]);
 
   const transitionStyles: React.CSSProperties = {
     opacity: isVisible ? 1 : 0,
     transform: isVisible ? getActiveTransform() : getInitialTransform(),
-    filter: getFilter(),
-    clipPath: getClipPath(),
+    filter: isVisible ? getActiveFilter() : getInitialFilter(),
+    clipPath: isVisible ? getActiveClipPath() : getInitialClipPath(),
     transformOrigin:
       variant === 'line-wipe'
         ? 'left center'
@@ -307,11 +395,12 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   return (
     <div
       ref={wrapperRef}
+      data-scroll-reveal={variant}
+      data-reveal-state={isVisible ? 'visible' : 'hidden'}
       className={`${variant === 'split-mask' ? 'overflow-hidden ' : ''}${className}`}
     >
       <Component
-        data-scroll-reveal={variant}
-        data-reveal-state={isVisible ? 'visible' : 'hidden'}
+        ref={innerRef}
         className="h-full w-full"
         style={transitionStyles}
       >
@@ -400,19 +489,21 @@ export const CountingNumber: React.FC<CountingNumberProps> = ({
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
-      if (rect.top <= vh * 0.85 && rect.bottom >= 20) {
+      const vw = window.innerWidth || document.documentElement.clientWidth;
+      const triggerRatio = vw >= 768 ? 0.72 : 0.85;
+      if (rect.top <= vh * triggerRatio && rect.bottom >= 20) {
         setIsActive(true);
-      } else if (rect.top >= vh * 0.96 || rect.bottom <= -10) {
+      } else if (rect.top >= vh * 0.92 || rect.bottom <= -10) {
         setIsActive(false);
         setDisplayValue(0);
       }
     };
 
     check();
-    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('scroll', check, { passive: true, capture: true });
     window.addEventListener('resize', check, { passive: true });
     return () => {
-      window.removeEventListener('scroll', check);
+      window.removeEventListener('scroll', check, true);
       window.removeEventListener('resize', check);
     };
   }, []);

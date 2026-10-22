@@ -35,7 +35,7 @@ export const Marketing3DCore: React.FC<Marketing3DCoreProps> = ({
       return;
     }
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion = false;
 
     let width = container.clientWidth || 500;
     let height = container.clientHeight || 500;
