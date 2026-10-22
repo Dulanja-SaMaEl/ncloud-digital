@@ -1,142 +1,192 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useCart } from './CartContext';
 
 interface CartDrawerProps {
-  onCheckout: () => void;
+  navigate: (route: string) => void;
 }
 
-export const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
-  const { items, isCartOpen, setIsCartOpen, removeItem, updateQuantity, subtotal, totalCount } = useCart();
+export const CartDrawer: React.FC<CartDrawerProps> = ({ navigate }) => {
+  const {
+    items,
+    isCartOpen,
+    closeCart,
+    removeFromCart,
+    updateQuantity,
+    subtotal,
+    openCheckout,
+  } = useCart();
 
-  if (!isCartOpen) return null;
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isCartOpen]);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-        onClick={() => setIsCartOpen(false)}
+        onClick={closeCart}
+        className={`fixed inset-0 z-[1000] bg-black/40 backdrop-blur-sm transition-opacity duration-500 ${
+          isCartOpen
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none'
+        }`}
       />
 
-      {/* Drawer Surface */}
-      <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between z-10 p-6 md:p-8 animate-fade-in border-l border-median-taupe/20">
-        <div>
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-median-taupe/20 pb-5 mb-6">
-            <div className="flex items-center gap-3">
-              <span className="font-oswald text-2xl font-bold uppercase text-black">
-                Your Selection
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-median-taupe/15 text-median-taupe text-xs font-bold font-mono">
-                {totalCount} {totalCount === 1 ? 'PACKAGE' : 'PACKAGES'}
-              </span>
-            </div>
-
-            <button
-              onClick={() => setIsCartOpen(false)}
-              data-cursor="pointer"
-              className="w-8 h-8 rounded-full border border-median-taupe/40 flex items-center justify-center text-black hover:bg-black hover:text-white transition-colors"
-            >
-              ✕
-            </button>
+      {/* Drawer */}
+      <div
+        className={`fixed top-0 right-0 bottom-0 w-full sm:w-[450px] z-[1001] bg-white text-median-taupe flex flex-col justify-between shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isCartOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        {/* Header */}
+        <div className="p-6 md:p-8 border-b border-median-taupe/20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h4 className="font-oswald text-2xl font-bold uppercase tracking-wide text-black">
+              Your Cart
+            </h4>
+            <span className="text-xs px-2.5 py-1 rounded-full bg-median-taupe text-white font-bold">
+              {items.reduce((sum, item) => sum + item.quantity, 0)}
+            </span>
           </div>
 
-          {/* Cart Item List */}
+          <button
+            onClick={closeCart}
+            aria-label="Close Cart"
+            data-cursor="pointer"
+            className="w-9 h-9 rounded-full border border-median-taupe/30 hover:border-median-taupe flex items-center justify-center transition-colors group"
+          >
+            <span className="text-sm font-bold text-median-taupe group-hover:rotate-90 transition-transform duration-300">
+              ✕
+            </span>
+          </button>
+        </div>
+
+        {/* Item List / Empty State */}
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
           {items.length === 0 ? (
-            <div className="py-20 text-center text-median-taupe">
-              <div className="w-12 h-12 rounded-full border border-dashed border-median-taupe/40 flex items-center justify-center mx-auto mb-4 text-lg">
-                ✦
+            <div className="h-full flex flex-col items-center justify-center text-center py-12">
+              <div className="w-16 h-16 rounded-full border-2 border-dashed border-median-taupe/40 flex items-center justify-center mb-4">
+                <img
+                  src="/assets/cart.png"
+                  alt="Empty Cart"
+                  className="w-7 h-7 object-contain opacity-50"
+                />
               </div>
-              <p className="font-oswald text-lg font-semibold text-black uppercase mb-1">
-                Your cart is empty
+              <h5 className="font-oswald text-xl font-semibold uppercase text-black mb-1">
+                No items in your cart
+              </h5>
+              <p className="text-xs text-median-taupe/80 max-w-xs mb-6">
+                Explore our studio packages, single-page website designs, or bespoke digital solutions.
               </p>
-              <p className="text-xs text-median-taupe/70 max-w-xs mx-auto">
-                Explore our growth engineering packages and add one to initiate your project sprint.
-              </p>
+              <button
+                onClick={() => {
+                  closeCart();
+                  navigate('/pricing');
+                }}
+                data-cursor="pointer"
+                className="px-6 py-3 rounded-full bg-median-taupe text-white text-xs font-bold tracking-wider uppercase hover:bg-black transition-colors"
+              >
+                Discover Packages
+              </button>
             </div>
           ) : (
-            <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-1">
-              {items.map((item) => {
-                const isAnnual = item.billingCycle === 'annual';
-                const price = isAnnual ? item.plan.priceAnnual * 12 : item.plan.priceMonthly;
+            items.map((item) => (
+              <div
+                key={item.id}
+                className="flex gap-4 pb-6 border-b border-median-taupe/15 last:border-b-0"
+              >
+                {/* Thumbnail */}
+                <div className="w-20 h-20 rounded-lg overflow-hidden bg-median-taupe/10 flex-shrink-0 border border-median-taupe/20">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
 
-                return (
-                  <div
-                    key={`${item.plan.id}-${item.billingCycle}`}
-                    className="p-4 rounded-xl border border-median-taupe/20 bg-median-cream flex items-start justify-between gap-4"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-oswald text-base font-bold uppercase text-black">
-                          {item.plan.title}
-                        </h4>
-                        <span className="font-oswald text-base font-bold text-black">
-                          ${price * item.quantity}
+                {/* Details */}
+                <div className="flex-1 flex flex-col justify-between">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <h5 className="font-oswald text-base font-semibold uppercase text-black">
+                        {item.title}
+                      </h5>
+                      {item.type && (
+                        <span className="text-[11px] text-median-taupe/70 uppercase">
+                          {item.type}
                         </span>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-[10px] uppercase font-bold text-median-taupe mb-3">
-                        <span className="px-2 py-0.5 bg-white rounded border border-median-taupe/30">
-                          {isAnnual ? 'Annual Sprint (-20%)' : 'Monthly Retainer'}
-                        </span>
-                      </div>
-
-                      {/* Quantity & Delete Controls */}
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center border border-median-taupe/30 rounded-lg overflow-hidden bg-white">
-                          <button
-                            onClick={() => updateQuantity(item.plan.id, item.quantity - 1)}
-                            className="w-7 h-7 flex items-center justify-center text-black hover:bg-median-taupe/20"
-                          >
-                            -
-                          </button>
-                          <span className="w-8 text-center text-xs font-bold font-mono text-black">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item.plan.id, item.quantity + 1)}
-                            className="w-7 h-7 flex items-center justify-center text-black hover:bg-median-taupe/20"
-                          >
-                            +
-                          </button>
-                        </div>
-
-                        <button
-                          onClick={() => removeItem(item.plan.id)}
-                          className="text-[11px] text-median-taupe hover:text-red-600 transition-colors underline"
-                        >
-                          Remove
-                        </button>
-                      </div>
+                      )}
                     </div>
+                    <span className="font-oswald text-base font-semibold text-black">
+                      ${item.price.toFixed(2)} USD
+                    </span>
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Quantity and Remove */}
+                  <div className="flex items-center justify-between mt-3 pt-2">
+                    <div className="flex items-center border border-median-taupe/40 rounded-full px-2 py-0.5 gap-3">
+                      <button
+                        onClick={() => updateQuantity(item.id, -1)}
+                        className="text-xs font-bold px-1 hover:text-black"
+                        aria-label="Decrease quantity"
+                      >
+                        –
+                      </button>
+                      <span className="text-xs font-bold text-black min-w-3 text-center">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.id, 1)}
+                        className="text-xs font-bold px-1 hover:text-black"
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-[11px] font-semibold text-median-taupe/70 hover:text-red-500 uppercase transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
           )}
         </div>
 
-        {/* Footer Actions */}
+        {/* Footer with Subtotal & Checkout */}
         {items.length > 0 && (
-          <div className="pt-6 border-t border-median-taupe/20 space-y-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-xs uppercase font-semibold text-median-taupe">Total Investment</span>
-              <span className="font-oswald text-2xl font-bold text-black">${subtotal}</span>
+          <div className="p-6 md:p-8 border-t border-median-taupe/20 bg-median-taupe/5 space-y-4">
+            <div className="flex justify-between items-center text-sm font-semibold text-black">
+              <span>SUBTOTAL</span>
+              <span className="font-oswald text-xl">
+                ${subtotal.toFixed(2)} USD
+              </span>
             </div>
-
+            <p className="text-[11px] text-median-taupe/70 leading-relaxed">
+              Taxes calculated at checkout. Includes instant source code delivery and studio commercial license.
+            </p>
             <button
-              onClick={() => {
-                setIsCartOpen(false);
-                onCheckout();
-              }}
+              onClick={openCheckout}
               data-cursor="pointer"
-              className="w-full py-4 rounded-full bg-median-taupe hover:bg-black text-white font-oswald text-sm font-bold tracking-widest uppercase transition-colors shadow-lg"
+              className="w-full py-4 rounded-xl bg-median-taupe hover:bg-black text-white text-xs font-bold tracking-widest uppercase transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
             >
-              Confirm Sprint &amp; Checkout
+              <span>Continue to Checkout</span>
+              <span>→</span>
             </button>
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BlogPost } from './siteData';
 
 interface ArticleReaderModalProps {
@@ -7,93 +7,101 @@ interface ArticleReaderModalProps {
 }
 
 export const ArticleReaderModal: React.FC<ArticleReaderModalProps> = ({ post, onClose }) => {
+  useEffect(() => {
+    if (post) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [post]);
+
   if (!post) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12 overflow-y-auto">
+    <div className="fixed inset-0 z-[1050] flex items-center justify-center p-4 sm:p-6 md:p-10">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity"
         onClick={onClose}
+        className="fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity"
       />
 
-      {/* Modal Surface */}
-      <div className="relative w-full max-w-3xl bg-white rounded-3xl overflow-hidden shadow-2xl z-10 border border-median-taupe/20 animate-fade-in my-auto max-h-[92vh] flex flex-col">
-        {/* Sticky Close Button */}
+      {/* Modal Container */}
+      <div className="relative z-10 bg-white max-w-3xl w-full max-h-[90vh] rounded-3xl shadow-2xl border border-median-taupe/20 overflow-y-auto text-median-taupe">
+        {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label="Close Article"
           data-cursor="pointer"
-          className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-median-taupe/30 flex items-center justify-center text-black hover:bg-black hover:text-white transition-colors shadow-md"
+          className="absolute top-6 right-6 z-20 w-11 h-11 rounded-full bg-white/90 backdrop-blur-sm border border-median-taupe/30 hover:border-median-taupe flex items-center justify-center shadow-lg transition-all group"
         >
-          ✕
+          <span className="text-base font-bold text-black group-hover:rotate-90 transition-transform duration-300">
+            ✕
+          </span>
         </button>
 
-        <div className="overflow-y-auto flex-1 p-8 sm:p-12 md:p-16 space-y-8">
-          {/* Header Metadata */}
-          <div>
-            <div className="flex items-center gap-3 text-xs font-bold font-mono uppercase text-median-taupe mb-4">
-              <span className="px-3 py-1 rounded-full bg-median-cream border border-median-taupe/30">
-                {post.category}
-              </span>
-              <span>&bull;</span>
-              <span>{post.date}</span>
-              <span>&bull;</span>
-              <span>{post.readTime}</span>
-            </div>
-
-            <h1 className="font-oswald text-3xl sm:text-5xl font-bold uppercase text-black leading-tight tracking-tight">
+        {/* Article Cover */}
+        <div className="relative h-64 sm:h-80 w-full overflow-hidden bg-median-taupe/10">
+          <img
+            src={post.image}
+            alt={post.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-8 text-white">
+            <span className="text-xs font-bold tracking-widest uppercase text-white/80 mb-2">
+              {post.category} • {post.date}
+            </span>
+            <h2 className="font-oswald text-3xl sm:text-5xl font-bold uppercase tracking-tight text-white drop-shadow-md">
               {post.title}
-            </h1>
+            </h2>
           </div>
+        </div>
 
-          {/* Author Badge */}
-          <div className="flex items-center gap-4 py-4 border-y border-median-taupe/15">
+        {/* Article Body */}
+        <div className="p-8 sm:p-12 space-y-8">
+          {/* Author Row */}
+          <div className="flex items-center gap-4 pb-6 border-b border-median-taupe/20">
             <img
               src={post.author.avatar}
               alt={post.author.name}
-              className="w-12 h-12 rounded-full object-cover border border-median-taupe/30"
+              className="w-12 h-12 rounded-full object-cover border border-median-taupe"
             />
             <div>
-              <span className="font-oswald text-base font-bold uppercase text-black block">
+              <div className="font-oswald text-base font-bold text-black uppercase">
                 {post.author.name}
-              </span>
-              <span className="text-xs text-median-taupe uppercase font-semibold">
-                {post.author.role} &bull; NCloud Digital
-              </span>
+              </div>
+              <div className="text-xs text-median-taupe/70 font-semibold uppercase">
+                {post.author.role} • {post.readTime}
+              </div>
             </div>
           </div>
 
-          {/* Featured Image */}
-          <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-median-taupe/10">
-            <img
-              src={post.image}
-              alt={post.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          {/* Lead Summary */}
+          <p className="font-oswald text-xl sm:text-2xl text-black font-normal leading-snug">
+            {post.summary}
+          </p>
 
-          {/* Article Text Content */}
-          <div className="space-y-6 text-sm sm:text-base text-median-taupe/90 font-normal leading-relaxed pt-4">
-            {post.content.map((paragraph, idx) => (
-              <p key={idx} className="first-letter:font-oswald first-letter:text-3xl first-letter:font-bold first-letter:float-left first-letter:mr-2">
-                {paragraph}
-              </p>
+          {/* Paragraphs */}
+          <div className="space-y-6 text-sm sm:text-base text-black/85 leading-relaxed font-normal normal-case">
+            {post.content.map((p, idx) => (
+              <p key={idx}>{p}</p>
             ))}
           </div>
 
-          {/* Footer note */}
-          <div className="p-6 rounded-2xl bg-median-cream border border-median-taupe/20 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-xs uppercase font-semibold text-black">
-              Want to scale your digital pipeline with NCloud Digital?
-            </span>
-            <a
-              href="https://wa.me/94760967884"
-              target="_blank"
-              rel="noreferrer"
-              className="px-6 py-2.5 rounded-full bg-median-taupe hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-colors"
+          {/* Share & Close */}
+          <div className="pt-8 border-t border-median-taupe/20 flex items-center justify-between">
+            <div className="text-xs font-bold uppercase text-median-taupe/70">
+              Published by Median Insights
+            </div>
+            <button
+              onClick={onClose}
+              data-cursor="pointer"
+              className="px-6 py-2.5 rounded-full border border-median-taupe hover:bg-median-taupe hover:text-white text-xs font-bold uppercase tracking-wider transition-colors"
             >
-              Direct WhatsApp &rarr;
-            </a>
+              Back to Articles
+            </button>
           </div>
         </div>
       </div>

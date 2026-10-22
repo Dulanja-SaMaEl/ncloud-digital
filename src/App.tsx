@@ -1699,14 +1699,46 @@ export default function App() {
   useEffect(() => {
     if (activeView === 'jack') {
       document.title = 'NCloud Digital | 3D Experience & Growth Systems';
+      document.body.style.backgroundColor = '#0C0C0C';
+      document.documentElement.style.backgroundColor = '#0C0C0C';
+      document.documentElement.style.colorScheme = 'dark';
+      document.body.classList.remove('median-mode');
+      document.documentElement.classList.remove('median-mode');
     } else if (activeView === 'halo') {
       document.title = 'Halo / USD Halo — The Automated Digital Dollar';
+      document.body.style.backgroundColor = '#0C0C0C';
+      document.documentElement.style.backgroundColor = '#0C0C0C';
+      document.documentElement.style.colorScheme = 'dark';
+      document.body.classList.remove('median-mode');
+      document.documentElement.classList.remove('median-mode');
     } else if (activeView === 'median') {
       document.title = 'NCloud Digital | Haute Editorial Studio Experience';
+      document.body.style.backgroundColor = '#ffffff';
+      document.documentElement.style.backgroundColor = '#ffffff';
+      document.documentElement.style.colorScheme = 'light';
+      document.body.classList.add('median-mode');
+      document.documentElement.classList.add('median-mode');
     } else {
       document.title = 'NCloud Digital | Premium Digital Marketing & Web Development Agency';
+      document.body.style.backgroundColor = '#0C0C0C';
+      document.documentElement.style.backgroundColor = '#0C0C0C';
+      document.documentElement.style.colorScheme = 'dark';
+      document.body.classList.remove('median-mode');
+      document.documentElement.classList.remove('median-mode');
     }
   }, [activeView]);
+
+  const switchView = (view: 'jack' | 'ncloud' | 'halo' | 'median') => {
+    setActiveView(view);
+    const url = new URL(window.location.href);
+    if (view === 'ncloud') {
+      url.searchParams.delete('view');
+      window.history.pushState({}, '', url.pathname);
+    } else {
+      url.searchParams.set('view', view);
+      window.history.pushState({}, '', url.search);
+    }
+  };
 
   return (
     <>
@@ -1716,7 +1748,7 @@ export default function App() {
         className="fixed bottom-4 left-4 z-50 flex items-center gap-1.5 p-1.5 bg-[#121820]/95 backdrop-blur-md border border-white/10 rounded-full shadow-2xl text-xs font-sans select-none"
       >
         <button
-          onClick={() => setActiveView('ncloud')}
+          onClick={() => switchView('ncloud')}
           className={`px-3 py-1.5 rounded-full transition-all duration-200 font-semibold cursor-pointer ${
             activeView === 'ncloud'
               ? 'bg-cyan-500 text-black shadow-md'
@@ -1726,7 +1758,7 @@ export default function App() {
           Classic Agency
         </button>
         <button
-          onClick={() => setActiveView('jack')}
+          onClick={() => switchView('jack')}
           className={`px-3 py-1.5 rounded-full transition-all duration-200 font-medium cursor-pointer ${
             activeView === 'jack'
               ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
@@ -1736,7 +1768,7 @@ export default function App() {
           NCloud 3D
         </button>
         <button
-          onClick={() => setActiveView('halo')}
+          onClick={() => switchView('halo')}
           className={`px-3.5 py-1.5 rounded-full transition-all duration-200 font-semibold cursor-pointer ${
             activeView === 'halo'
               ? 'bg-white text-black shadow-md'
@@ -1746,7 +1778,7 @@ export default function App() {
           Halo (Fintech)
         </button>
         <button
-          onClick={() => setActiveView('median')}
+          onClick={() => switchView('median')}
           className={`px-3.5 py-1.5 rounded-full transition-all duration-200 font-semibold cursor-pointer ${
             activeView === 'median'
               ? 'bg-[#9F8170] text-white shadow-md'

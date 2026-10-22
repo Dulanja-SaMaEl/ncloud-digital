@@ -34,8 +34,28 @@
   body, #root {
     background-color: #0C0C0C;
     color: #F5F7FA;
-    font-family: 'Kanit', sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     min-height: 100vh;
+  }
+
+  html.median-mode, body.median-mode {
+    background-color: #ffffff !important;
+    color: #9F8170 !important;
+    color-scheme: light !important;
+  }
+
+  html.median-mode ::-webkit-scrollbar-track,
+  body.median-mode ::-webkit-scrollbar-track {
+    background: #ffffff !important;
+  }
+  html.median-mode ::-webkit-scrollbar-thumb,
+  body.median-mode ::-webkit-scrollbar-thumb {
+    background: #9F8170 !important;
+    border-radius: 9999px !important;
+  }
+  html.median-mode ::-webkit-scrollbar-thumb:hover,
+  body.median-mode ::-webkit-scrollbar-thumb:hover {
+    background: #141414 !important;
   }
 
   /* Custom subtle scrollbar */
@@ -143,6 +163,46 @@
 
   .animate-fade-in {
     animation: fadeInModal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Scoped Median Studio Styles - 100% matched to original median-template */
+  .median-root {
+    --color: #9F8170;
+    --black: #ffffff;
+    --black-2: #000000;
+    font-family: 'Inter Tight', sans-serif !important;
+    text-transform: uppercase !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 20px !important;
+    color: #9F8170 !important;
+    background-color: #ffffff !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .median-root h1,
+  .median-root h2,
+  .median-root h3,
+  .median-root h4,
+  .median-root h5,
+  .median-root h6,
+  .median-root .font-oswald {
+    font-family: 'Oswald', sans-serif !important;
+    text-transform: uppercase !important;
+  }
+
+  .median-root .font-inter {
+    font-family: 'Inter Tight', sans-serif !important;
+  }
+
+  .median-root .font-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  }
+
+  .median-root ::selection {
+    background-color: #9F8170 !important;
+    color: #ffffff !important;
   }
 }
 

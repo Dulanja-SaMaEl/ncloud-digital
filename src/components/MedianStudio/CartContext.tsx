@@ -1,98 +1,122 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { PricingPlan } from './siteData';
 
 export interface CartItem {
-  plan: PricingPlan;
-  billingCycle: 'monthly' | 'annual';
+  id: string;
+  title: string;
+  price: number;
+  image: string;
   quantity: number;
+  type?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (plan: PricingPlan, billingCycle?: 'monthly' | 'annual') => void;
-  removeItem: (planId: string) => void;
-  updateQuantity: (planId: string, quantity: number) => void;
-  clearCart: () => void;
   isCartOpen: boolean;
-  setIsCartOpen: (open: boolean) => void;
-  totalCount: number;
+  openCart: () => void;
+  closeCart: () => void;
+  addToCart: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
+  removeFromCart: (id: string) => void;
+  updateQuantity: (id: string, delta: number) => void;
+  clearCart: () => void;
   subtotal: number;
+  totalCount: number;
+  isCheckoutOpen: boolean;
+  openCheckout: () => void;
+  closeCheckout: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('ncloud_editorial_cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
+  // Initialize with one default item from the template
+  const [items, setItems] = useState<CartItem[]>([
+    {
+      id: 'single-page-website',
+      title: 'Single-Page Website',
+      price: 199,
+      image: '/assets/work-4.jpg',
+      quantity: 1,
+      type: 'Template Package'
     }
-  });
-
+  ]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('ncloud_editorial_cart', JSON.stringify(items));
-    } catch {
-      // Ignore
-    }
-  }, [items]);
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
 
-  const addItem = (plan: PricingPlan, billingCycle: 'monthly' | 'annual' = 'monthly') => {
+  const openCheckout = () => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  };
+  const closeCheckout = () => setIsCheckoutOpen(false);
+
+  const addToCart = (newItem: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
     setItems((prev) => {
-      const existing = prev.find((item) => item.plan.id === plan.id && item.billingCycle === billingCycle);
+      const existing = prev.find((item) => item.id === newItem.id);
       if (existing) {
         return prev.map((item) =>
-          item.plan.id === plan.id && item.billingCycle === billingCycle
-            ? { ...item, quantity: item.quantity + 1 }
+          item.id === newItem.id
+            ? { ...item, quantity: item.quantity + (newItem.quantity || 1) }
             : item
         );
       }
-      return [...prev, { plan, billingCycle, quantity: 1 }];
+      return [...prev, { ...newItem, quantity: newItem.quantity || 1 }];
     });
     setIsCartOpen(true);
   };
 
-  const removeItem = (planId: string) => {
-    setItems((prev) => prev.filter((item) => item.plan.id !== planId));
+  const removeFromCart = (id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const updateQuantity = (planId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeItem(planId);
-      return;
-    }
+  const updateQuantity = (id: string, delta: number) => {
     setItems((prev) =>
-      prev.map((item) => (item.plan.id === planId ? { ...item, quantity } : item))
+      prev
+        .map((item) => {
+          if (item.id === id) {
+            const nextQty = item.quantity + delta;
+            return nextQty > 0 ? { ...item, quantity: nextQty } : null;
+          }
+          return item;
+        })
+        .filter(Boolean) as CartItem[]
     );
   };
 
-  const clearCart = () => {
-    setItems([]);
-  };
+  const clearCart = () => setItems([]);
 
-  const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
-  const subtotal = items.reduce((sum, item) => {
-    const price = item.billingCycle === 'annual' ? item.plan.priceAnnual * 12 : item.plan.priceMonthly;
-    return sum + price * item.quantity;
-  }, 0);
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsCartOpen(false);
+        setIsCheckoutOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <CartContext.Provider
       value={{
         items,
-        addItem,
-        removeItem,
+        isCartOpen,
+        openCart,
+        closeCart,
+        addToCart,
+        removeFromCart,
         updateQuantity,
         clearCart,
-        isCartOpen,
-        setIsCartOpen,
-        totalCount,
         subtotal,
+        totalCount,
+        isCheckoutOpen,
+        openCheckout,
+        closeCheckout,
       }}
     >
       {children}

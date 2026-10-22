@@ -40,6 +40,7 @@ const activeEvaluators = new Set<() => void>();
 let cascadeTimers: number[] = [];
 
 function triggerCascadeReevaluation() {
+  // Immediately notify nested children in the next microtask/frame, plus follow-up ticks
   queueMicrotask(() => {
     activeEvaluators.forEach((fn) => fn());
   });
@@ -80,8 +81,8 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
     const isPreloaderActive = () => {
       if (typeof window === 'undefined') return false;
       if ((window.scrollY || window.pageYOffset) >= 10) return false;
-      const seen = sessionStorage.getItem('ncloud_editorial_preloader_seen');
-      const done = (window as unknown as { __ncloud_editorial_preloader_done?: boolean }).__ncloud_editorial_preloader_done;
+      const seen = sessionStorage.getItem('median_preloader_seen');
+      const done = (window as unknown as { __median_preloader_done?: boolean }).__median_preloader_done;
       return !seen && !done;
     };
 
@@ -129,6 +130,7 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
     activeEvaluators.add(evaluateVisibility);
 
     // Wait two animation frames so the browser paints the initial opacity:0 / displaced transform
+    // before transitioning to the active state
     raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
         isMountedAndPainted = true;
@@ -166,7 +168,7 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
 
     window.addEventListener('scroll', onScrollOrResize, { passive: true });
     window.addEventListener('resize', onScrollOrResize, { passive: true });
-    window.addEventListener('ncloud_editorial_preloader_done', onPreloaderDone);
+    window.addEventListener('median_preloader_done', onPreloaderDone);
 
     return () => {
       activeEvaluators.delete(evaluateVisibility);
@@ -175,7 +177,7 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
       if (observer) observer.disconnect();
       window.removeEventListener('scroll', onScrollOrResize);
       window.removeEventListener('resize', onScrollOrResize);
-      window.removeEventListener('ncloud_editorial_preloader_done', onPreloaderDone);
+      window.removeEventListener('median_preloader_done', onPreloaderDone);
     };
   }, [once]);
 

@@ -1,283 +1,305 @@
 import React, { useState } from 'react';
-import confetti from 'canvas-confetti';
-import { STUDIO_OFFICES } from './siteData';
-import { ScrollReveal } from './ScrollReveal';
+import { RotatingRibbons } from './RotatingRibbons';
+import { ScrollReveal, StaggerContainer } from './ScrollReveal';
 
 interface ContactPageProps {
   navigate: (route: string) => void;
 }
 
-export const ContactPage: React.FC<ContactPageProps> = () => {
-  const [submitted, setSubmitted] = useState(false);
+export const ContactPage: React.FC<ContactPageProps> = ({ navigate }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
     company: '',
-    service: 'Full Growth System (Ads + Web)',
-    budget: '$1,000 - $3,000 / mo',
+    service: 'Website Design',
+    budget: '$5k – $15k',
     message: '',
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const services = [
+    'Product Design',
+    'Website Design',
+    'Marketing',
+    'Custom System',
+  ];
+
+  const budgetTiers = [
+    '< $5,000',
+    '$5,000 – $15,000',
+    '$15,000 – $35,000',
+    '$35,000+',
+  ];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    try {
-      confetti({
-        particleCount: 70,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#9F8170', '#000000', '#ffffff']
-      });
-    } catch {}
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    }, 1000);
   };
 
   return (
-    <div className="pt-28 pb-24 bg-white text-median-taupe min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        {/* Page Header */}
-        <div className="py-12 border-b border-median-taupe/20 mb-16">
-          <ScrollReveal variant="badge-drop">
-            <span className="text-xs font-bold tracking-widest uppercase text-median-taupe/70 block mb-2 font-mono">
-              // COMMENCE COLLABORATION &bull; DIRECT CONTACT
+    <div className="pt-32 pb-16 bg-white text-median-taupe">
+      {/* Header */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 mb-16">
+        <ScrollReveal variant="scale-up" duration={900}>
+          <div className="border border-median-taupe/20 rounded-2xl p-8 sm:p-16 relative bg-median-taupe/5">
+            <span className="absolute -top-2.5 -left-2.5 w-5 h-5 border-2 border-median-taupe bg-white shadow-sm" />
+            <span className="absolute -top-2.5 -right-2.5 w-5 h-5 border-2 border-median-taupe bg-white shadow-sm" />
+            <span className="absolute -bottom-2.5 -left-2.5 w-5 h-5 border-2 border-median-taupe bg-white shadow-sm" />
+            <span className="absolute -bottom-2.5 -right-2.5 w-5 h-5 border-2 border-median-taupe bg-white shadow-sm" />
+
+            <span className="text-xs font-bold tracking-widest uppercase text-median-taupe block mb-4">
+              Initiate Collaboration
             </span>
-          </ScrollReveal>
-          <ScrollReveal variant="split-mask" delay={100}>
-            <h1 className="font-oswald text-5xl sm:text-7xl font-bold uppercase tracking-tight text-black mb-4">
-              Let&apos;s Build Your System
+            <h1 className="font-oswald text-5xl sm:text-7xl md:text-8xl font-bold uppercase tracking-tight text-black leading-none mb-6">
+              Stay in Touch
             </h1>
-          </ScrollReveal>
-          <ScrollReveal variant="blur-focus" delay={180}>
-            <p className="text-xs sm:text-sm text-median-taupe/80 max-w-xl font-normal leading-relaxed">
-              Reach out directly to Founder Dulan on WhatsApp or submit your growth requirements below. We review every brief within 24 hours.
+            <p className="text-sm sm:text-lg text-black/85 max-w-2xl font-normal leading-relaxed">
+              Have an upcoming project, redesign, or architectural inquiry? Fill out the brief below and our partners will respond within 24 hours.
             </p>
-          </ScrollReveal>
-        </div>
-
-        {/* 2-Column Contact Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-24">
-          {/* Left Column: Direct Inquiries & Offices */}
-          <div className="lg:col-span-5 space-y-10">
-            <div>
-              <span className="text-xs font-bold font-mono uppercase tracking-wider text-median-taupe/70 block mb-2">
-                Direct Communication
-              </span>
-              <div className="space-y-4">
-                <div className="p-6 rounded-2xl bg-median-cream border border-median-taupe/20 space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-median-taupe font-bold block">
-                    Direct Hotline &bull; Colombo HQ
-                  </span>
-                  <a
-                    href="tel:+94760967884"
-                    className="font-oswald text-2xl font-bold uppercase text-black hover:text-median-taupe transition-colors block"
-                  >
-                    +94 76 096 7884
-                  </a>
-                  <span className="text-xs text-median-taupe/70 block">
-                    Available Mon–Sat: 8:00 AM – 8:00 PM IST
-                  </span>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-median-cream border border-median-taupe/20 space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-median-taupe font-bold block">
-                    Instant Messaging
-                  </span>
-                  <a
-                    href="https://wa.me/94760967884"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-oswald text-2xl font-bold uppercase text-black hover:text-median-taupe transition-colors block"
-                  >
-                    WhatsApp Founder Dulan &rarr;
-                  </a>
-                  <span className="text-xs text-median-taupe/70 block">
-                    Fastest channel for project estimates &amp; audits
-                  </span>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-median-cream border border-median-taupe/20 space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-median-taupe font-bold block">
-                    Official Inquiries
-                  </span>
-                  <a
-                    href="mailto:info@nclouddigital.com"
-                    className="font-oswald text-2xl font-bold uppercase text-black hover:text-median-taupe transition-colors block"
-                  >
-                    info@nclouddigital.com
-                  </a>
-                  <span className="text-xs text-median-taupe/70 block">
-                    Guaranteed formal proposal within 24 hours
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Studio Offices list */}
-            <div>
-              <span className="text-xs font-bold font-mono uppercase tracking-wider text-median-taupe/70 block mb-4">
-                Studio Hubs
-              </span>
-              <div className="space-y-4">
-                {STUDIO_OFFICES.map((off) => (
-                  <div key={off.city} className="border-l-2 border-median-taupe pl-4">
-                    <span className="font-oswald text-base font-bold uppercase text-black block">
-                      {off.city}
-                    </span>
-                    <p className="text-xs text-median-taupe/80">
-                      {off.address}, {off.region}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
+        </ScrollReveal>
+      </section>
 
-          {/* Right Column: Interactive Proposal Form */}
-          <div className="lg:col-span-7">
-            <div className="p-8 sm:p-12 rounded-3xl bg-median-cream border border-median-taupe/20">
-              {submitted ? (
-                <div className="py-16 text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-median-taupe text-white flex items-center justify-center text-3xl mx-auto">
-                    ✓
-                  </div>
-                  <h3 className="font-oswald text-3xl font-bold uppercase text-black">
-                    Proposal Request Received
-                  </h3>
-                  <p className="text-xs sm:text-sm text-median-taupe/80 max-w-md mx-auto leading-relaxed">
-                    Thank you, <strong>{formData.name}</strong>. Founder Dulan and our growth engineering team will analyze your requirements and reach out via WhatsApp ({formData.phone}) within 24 hours.
-                  </p>
-                  <button
-                    onClick={() => setSubmitted(false)}
-                    className="mt-4 px-6 py-2.5 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider font-mono"
-                  >
-                    Submit Another Inquiry
-                  </button>
+      {/* Main Grid: Form + Office Contacts */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 mb-28 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        {/* Form Container (7 cols) */}
+        <ScrollReveal variant="fade-up" duration={850} className="lg:col-span-7">
+          <div className="bg-white p-8 sm:p-12 rounded-2xl border border-median-taupe/20 shadow-sm">
+            {isSubmitted ? (
+              <div className="py-16 text-center space-y-6">
+                <div className="w-16 h-16 mx-auto rounded-full bg-median-taupe text-white flex items-center justify-center text-3xl font-bold">
+                  ✓
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <span className="text-xs font-bold font-mono uppercase tracking-wider text-median-taupe block mb-2">
-                    // SPRINT INQUIRY BRIEF
-                  </span>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-black mb-1.5 font-mono">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Nethum Vidyalankara"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-median-taupe/30 bg-white focus:border-black focus:outline-none text-xs text-black font-medium"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-black mb-1.5 font-mono">
-                        Company / Brand *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Apex Global Group"
-                        value={formData.company}
-                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-median-taupe/30 bg-white focus:border-black focus:outline-none text-xs text-black font-medium"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-black mb-1.5 font-mono">
-                        Work Email *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="nethum@brand.com"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-median-taupe/30 bg-white focus:border-black focus:outline-none text-xs text-black font-medium"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-black mb-1.5 font-mono">
-                        WhatsApp / Phone *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="+94 76 096 7884"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-median-taupe/30 bg-white focus:border-black focus:outline-none text-xs text-black font-medium"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-black mb-1.5 font-mono">
-                        Core Discipline
-                      </label>
-                      <select
-                        value={formData.service}
-                        onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-median-taupe/30 bg-white focus:border-black focus:outline-none text-xs text-black font-medium"
-                      >
-                        <option>Full Growth System (Ads + Web)</option>
-                        <option>Performance Meta Advertising</option>
-                        <option>Web & Headless Engineering</option>
-                        <option>Cinematic Video & Viral Reels</option>
-                        <option>Custom Enterprise Retainer</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-black mb-1.5 font-mono">
-                        Estimated Budget
-                      </label>
-                      <select
-                        value={formData.budget}
-                        onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-median-taupe/30 bg-white focus:border-black focus:outline-none text-xs text-black font-medium"
-                      >
-                        <option>$1,000 - $3,000 / mo</option>
-                        <option>$3,000 - $8,000 / mo</option>
-                        <option>$8,000 - $20,000 / mo</option>
-                        <option>$20,000+ / mo (Enterprise Scale)</option>
-                      </select>
-                    </div>
-                  </div>
-
+                <h3 className="font-oswald text-3xl font-bold uppercase text-black">
+                  Message Received
+                </h3>
+                <p className="text-xs sm:text-sm text-black/75 max-w-md mx-auto leading-relaxed">
+                  Thank you for reaching out, <strong className="text-black">{formData.name || 'there'}</strong>. Our directors will review your brief and schedule an initial discovery call.
+                </p>
+                <button
+                  onClick={() => {
+                    setIsSubmitted(false);
+                    setFormData({
+                      name: '',
+                      email: '',
+                      company: '',
+                      service: 'Website Design',
+                      budget: '$5k – $15k',
+                      message: '',
+                    });
+                  }}
+                  className="px-6 py-3 rounded-full border border-median-taupe hover:bg-median-taupe hover:text-white text-xs font-bold uppercase tracking-wider transition-colors"
+                >
+                  Send Another Note
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Name & Email */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-black mb-1.5 font-mono">
-                      Current Bottlenecks &amp; Growth Objectives
+                    <label className="block text-xs font-bold uppercase text-median-taupe/80 mb-2">
+                      Your Name *
                     </label>
-                    <textarea
-                      rows={4}
-                      placeholder="Share details regarding your current ad ROAS, required web functionality, or timeline expectations..."
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-median-taupe/30 bg-white focus:border-black focus:outline-none text-xs text-black font-medium resize-none"
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Jackson Miller"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-5 py-3.5 rounded-full border border-median-taupe/30 focus:border-median-taupe text-xs text-black outline-none transition-colors"
                     />
                   </div>
 
-                  <button
-                    type="submit"
-                    data-cursor="pointer"
-                    className="w-full py-4 rounded-full bg-median-taupe hover:bg-black text-white font-oswald text-sm font-bold tracking-widest uppercase transition-colors shadow-lg"
-                  >
-                    Request Custom Growth Strategy
-                  </button>
-                </form>
-              )}
-            </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-median-taupe/80 mb-2">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. jackson@company.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-5 py-3.5 rounded-full border border-median-taupe/30 focus:border-median-taupe text-xs text-black outline-none transition-colors"
+                    />
+                  </div>
+                </div>
+
+                {/* Company */}
+                <div>
+                  <label className="block text-xs font-bold uppercase text-median-taupe/80 mb-2">
+                    Company / Brand Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Lumina Labs"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-full border border-median-taupe/30 focus:border-median-taupe text-xs text-black outline-none transition-colors"
+                  />
+                </div>
+
+                {/* Service Interest Chips */}
+                <div>
+                  <label className="block text-xs font-bold uppercase text-median-taupe/80 mb-3">
+                    Service Need
+                  </label>
+                  <div className="flex flex-wrap gap-2.5">
+                    {services.map((srv) => (
+                      <button
+                        type="button"
+                        key={srv}
+                        onClick={() => setFormData({ ...formData, service: srv })}
+                        className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
+                          formData.service === srv
+                            ? 'bg-median-taupe text-white shadow-sm'
+                            : 'border border-median-taupe/30 text-black hover:border-median-taupe'
+                        }`}
+                      >
+                        {srv}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Budget Chips */}
+                <div>
+                  <label className="block text-xs font-bold uppercase text-median-taupe/80 mb-3">
+                    Estimated Budget Tier
+                  </label>
+                  <div className="flex flex-wrap gap-2.5">
+                    {budgetTiers.map((tier) => (
+                      <button
+                        type="button"
+                        key={tier}
+                        onClick={() => setFormData({ ...formData, budget: tier })}
+                        className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
+                          formData.budget === tier
+                            ? 'bg-median-taupe text-white shadow-sm'
+                            : 'border border-median-taupe/30 text-black hover:border-median-taupe'
+                        }`}
+                      >
+                        {tier}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Project Brief */}
+                <div>
+                  <label className="block text-xs font-bold uppercase text-median-taupe/80 mb-2">
+                    Project Brief & Objectives *
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    placeholder="Tell us about your brand vision, target timeline, and specific deliverables..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full p-4 rounded-2xl border border-median-taupe/30 focus:border-median-taupe text-xs text-black outline-none transition-colors"
+                  />
+                </div>
+
+                {/* Submit CTA */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  data-cursor="pointer"
+                  className="w-full py-4 rounded-xl bg-median-taupe hover:bg-black text-white text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-md hover:shadow-xl flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Transmitting Brief...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Submit Project Brief</span>
+                      <span>→</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </div>
+        </ScrollReveal>
+
+        {/* Studio Contacts & Locations (5 cols) */}
+        <div className="lg:col-span-5 space-y-8">
+          {/* Direct Line */}
+          <ScrollReveal variant="fade-left" delay={150} duration={800}>
+            <div className="p-8 rounded-2xl border border-median-taupe/20 bg-median-taupe/5 space-y-4">
+              <span className="text-xs font-bold tracking-widest uppercase text-median-taupe block">
+                Direct Contact
+              </span>
+              <div className="space-y-2">
+                <a
+                  href="mailto:info@nclouddigital.com"
+                  className="font-oswald text-2xl font-bold uppercase text-black hover:text-median-taupe block"
+                >
+                  info@nclouddigital.com
+                </a>
+                <a
+                  href="tel:+94760967884"
+                  className="font-oswald text-2xl font-bold uppercase text-black hover:text-median-taupe block"
+                >
+                  +94 76 096 7884
+                </a>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* Locations with StaggerContainer */}
+          <StaggerContainer staggerDelay={120} variant="scale-up" duration={750} className="space-y-4">
+            {[
+              {
+                city: 'Colombo',
+                address: '148 Galle Road, Suite 5B, Colombo 03, Sri Lanka',
+                tz: 'IST (UTC+5:30)',
+              },
+              {
+                city: 'Dubai',
+                address: 'Business Bay, Bay Square 12, Level 14, Dubai, UAE',
+                tz: 'GST (UTC+4)',
+              },
+              {
+                city: 'London',
+                address: '24 Old Street, Shoreditch, EC1V 9AB, London, UK',
+                tz: 'GMT/BST (UTC+0)',
+              },
+            ].map((loc) => (
+              <div
+                key={loc.city}
+                className="p-6 rounded-2xl border border-median-taupe/20 bg-white hover:border-median-taupe transition-colors space-y-1"
+              >
+                <div className="flex justify-between items-center">
+                  <h4 className="font-oswald text-xl font-bold uppercase text-black">
+                    {loc.city}
+                  </h4>
+                  <span className="text-[10px] font-semibold uppercase text-median-taupe/70">
+                    {loc.tz}
+                  </span>
+                </div>
+                <p className="text-xs text-black/75 font-normal leading-relaxed">
+                  {loc.address}
+                </p>
+              </div>
+            ))}
+          </StaggerContainer>
         </div>
-      </div>
+      </section>
+
+      {/* Rotating Ribbons */}
+      <ScrollReveal variant="scale-up" duration={1000}>
+        <RotatingRibbons navigate={navigate} />
+      </ScrollReveal>
     </div>
   );
 };

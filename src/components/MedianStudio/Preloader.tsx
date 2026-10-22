@@ -8,7 +8,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const [percent, setPercent] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
   const [isHidden, setIsHidden] = useState(() => {
-    return !!sessionStorage.getItem('ncloud_editorial_preloader_seen');
+    return !!sessionStorage.getItem('median_preloader_seen');
   });
 
   useEffect(() => {
@@ -17,7 +17,8 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       return;
     }
 
-    const duration = 850;
+    // Fast counter up to 100
+    const duration = 800; // 0.8 seconds
     const intervalTime = 20;
     const step = 100 / (duration / intervalTime);
 
@@ -25,8 +26,8 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       if ((window.scrollY || window.pageYOffset) > 5) {
         setPercent(100);
         setIsExiting(true);
-        (window as unknown as { __ncloud_editorial_preloader_done?: boolean }).__ncloud_editorial_preloader_done = true;
-        window.dispatchEvent(new CustomEvent('ncloud_editorial_preloader_done'));
+        (window as unknown as { __median_preloader_done?: boolean }).__median_preloader_done = true;
+        window.dispatchEvent(new CustomEvent('median_preloader_done'));
       }
     };
     window.addEventListener('scroll', markDoneEarlyOnScroll, { passive: true });
@@ -52,22 +53,24 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     if (percent === 100 && !isHidden) {
       const exitTimer = setTimeout(() => {
         setIsExiting(true);
-        (window as unknown as { __ncloud_editorial_preloader_done?: boolean }).__ncloud_editorial_preloader_done = true;
-        window.dispatchEvent(new CustomEvent('ncloud_editorial_preloader_done'));
+        // Start revealing hero content right as the preloader curtain starts sliding up
+        (window as unknown as { __median_preloader_done?: boolean }).__median_preloader_done = true;
+        window.dispatchEvent(new CustomEvent('median_preloader_done'));
 
         const hideTimer = setTimeout(() => {
           setIsHidden(true);
-          sessionStorage.setItem('ncloud_editorial_preloader_seen', 'true');
+          sessionStorage.setItem('median_preloader_seen', 'true');
           if (onComplete) onComplete();
-        }, 500);
+        }, 700);
         return () => clearTimeout(hideTimer);
-      }, 150);
+      }, 250);
       return () => clearTimeout(exitTimer);
     }
   }, [percent, isHidden, onComplete]);
 
   if (isHidden) return null;
 
+  // Format as 3 digits
   const formatted = String(percent).padStart(3, '0');
   const d1 = formatted[0];
   const d2 = formatted[1];
@@ -97,18 +100,21 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           <span className="w-2 h-2 rounded-full bg-white animate-ping" />
           <span>NCLOUD DIGITAL</span>
         </div>
-        <div className="hidden sm:block">EDITORIAL STUDIO &bull; GROWTH ARCHITECTURE</div>
-        <div>2026 EDITION</div>
+        <div className="hidden sm:block">INITIALIZING DIGITAL EXPERIENCE</div>
+        <div>2024–2026 EDITION</div>
       </div>
 
       {/* Center Big Rolling Numbers */}
       <div className="relative z-10 flex items-baseline justify-center font-oswald text-7xl sm:text-9xl md:text-[14rem] leading-none tracking-tight">
+        {/* Rolling column 1 */}
         <div className="relative h-[1em] overflow-hidden inline-flex">
           <span className="transition-transform duration-200">{d1}</span>
         </div>
+        {/* Rolling column 2 */}
         <div className="relative h-[1em] overflow-hidden inline-flex">
           <span className="transition-transform duration-200">{d2}</span>
         </div>
+        {/* Rolling column 3 */}
         <div className="relative h-[1em] overflow-hidden inline-flex">
           <span className="transition-transform duration-200">{d3}</span>
         </div>
@@ -120,7 +126,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       {/* Bottom Status Bar */}
       <div className="relative z-10 flex flex-col sm:flex-row justify-between items-center text-xs tracking-wider text-white/80 gap-3 border-t border-white/20 pt-4">
         <div>
-          <span>PERFORMANCE MARKETING &bull; WEB ENGINEERING</span>
+          <span>CREATIVE DIRECTION & E-COMMERCE</span>
         </div>
         <div className="w-48 bg-white/20 h-1 rounded-full overflow-hidden">
           <div
@@ -128,7 +134,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
             style={{ width: `${percent}%` }}
           />
         </div>
-        <div>INITIALIZING HAUTE DIGITAL SYSTEM</div>
+        <div>LOADING ASSETS & MOTION TOKENS</div>
       </div>
     </div>
   );

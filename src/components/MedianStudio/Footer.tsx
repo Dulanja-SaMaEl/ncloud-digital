@@ -1,6 +1,5 @@
 import React from 'react';
 import { ScrollReveal } from './ScrollReveal';
-import { STUDIO_OFFICES } from './siteData';
 
 interface FooterProps {
   navigate: (route: string) => void;
@@ -16,34 +15,49 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
           <div className="md:col-span-7 lg:col-span-8">
             <ScrollReveal variant="badge-drop" delay={0}>
               <div className="inline-flex items-center px-4 py-1.5 rounded-full border border-median-taupe text-xs font-bold tracking-widest uppercase mb-8">
-                Global Studio Hubs
+                Visit Us
               </div>
             </ScrollReveal>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-              {STUDIO_OFFICES.map((office, idx) => {
-                const variants = ['card-flip-left', 'card-lift', 'card-flip-right'] as const;
-                return (
-                  <ScrollReveal key={office.city} variant={variants[idx % variants.length]} delay={100 * (idx + 1)}>
-                    <div className="space-y-2">
-                      <span className="font-oswald text-lg font-semibold text-black uppercase block border-b border-median-taupe/40 pb-1 w-fit">
-                        {office.city}
-                      </span>
-                      <p className="text-xs text-median-taupe/80 leading-relaxed font-normal">
-                        {office.address}
-                        <br />
-                        {office.region}
-                      </p>
-                      <a
-                        href={`tel:${office.phone.replace(/\s+/g, '')}`}
-                        className="text-[11px] font-mono text-black font-semibold hover:text-median-taupe block pt-1"
-                      >
-                        {office.phone}
-                      </a>
-                    </div>
-                  </ScrollReveal>
-                );
-              })}
+              <ScrollReveal variant="card-flip-left" delay={100}>
+                <div className="space-y-2">
+                  <span className="font-oswald text-lg font-semibold text-black uppercase block border-b border-median-taupe/40 pb-1 w-fit">
+                    Colombo
+                  </span>
+                  <p className="text-xs text-median-taupe/80 leading-relaxed font-normal">
+                    148 Galle Road, Suite 5B
+                    <br />
+                    Colombo 03, Sri Lanka
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal variant="card-lift" delay={200}>
+                <div className="space-y-2">
+                  <span className="font-oswald text-lg font-semibold text-black uppercase block border-b border-median-taupe/40 pb-1 w-fit">
+                    Dubai
+                  </span>
+                  <p className="text-xs text-median-taupe/80 leading-relaxed font-normal">
+                    Business Bay, Bay Square 12
+                    <br />
+                    Level 14, Dubai, UAE
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal variant="card-flip-right" delay={300}>
+                <div className="space-y-2">
+                  <span className="font-oswald text-lg font-semibold text-black uppercase block border-b border-median-taupe/40 pb-1 w-fit">
+                    London
+                  </span>
+                  <p className="text-xs text-median-taupe/80 leading-relaxed font-normal">
+                    24 Old Street, Shoreditch
+                    <br />
+                    EC1V 9AB, London, UK
+                  </p>
+                </div>
+              </ScrollReveal>
             </div>
           </div>
 
@@ -51,7 +65,7 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
           <div className="md:col-span-5 lg:col-span-4 flex flex-col justify-start">
             <ScrollReveal variant="badge-drop" delay={150}>
               <div className="inline-flex items-center px-4 py-1.5 rounded-full border border-median-taupe text-xs font-bold tracking-widest uppercase mb-8 w-fit">
-                Initiate Project
+                Stay in Touch
               </div>
             </ScrollReveal>
 
@@ -64,12 +78,8 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
                   >
                     +94 76 096 7884
                   </a>
-                  <span className="text-[10px] font-mono text-median-taupe block mt-0.5">
-                    Direct Hotline &bull; Colombo HQ
-                  </span>
                 </div>
               </ScrollReveal>
-
               <ScrollReveal variant="horizontal-slide-right" delay={340}>
                 <div>
                   <a
@@ -78,28 +88,20 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
                   >
                     info@nclouddigital.com
                   </a>
-                  <span className="text-[10px] font-mono text-median-taupe block mt-0.5">
-                    Official Inquiries &bull; 24h Response
-                  </span>
                 </div>
               </ScrollReveal>
-
               <ScrollReveal variant="blur-focus" delay={420}>
-                <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-semibold text-median-taupe">
-                  <a href="https://wa.me/94760967884" target="_blank" rel="noreferrer" className="hover:text-black">
-                    WhatsApp
-                  </a>
-                  <span>•</span>
-                  <a href="https://instagram.com/nclouddigital" target="_blank" rel="noreferrer" className="hover:text-black">
-                    Instagram
-                  </a>
-                  <span>•</span>
-                  <a href="https://facebook.com/nclouddigital" target="_blank" rel="noreferrer" className="hover:text-black">
-                    Facebook
+                <div className="pt-2 flex items-center gap-4 text-xs font-semibold text-median-taupe">
+                  <a href="https://twitter.com" target="_blank" rel="noreferrer" className="hover:text-black">
+                    Twitter / X
                   </a>
                   <span>•</span>
                   <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-black">
                     LinkedIn
+                  </a>
+                  <span>•</span>
+                  <a href="https://dribbble.com" target="_blank" rel="noreferrer" className="hover:text-black">
+                    Dribbble
                   </a>
                 </div>
               </ScrollReveal>
@@ -111,19 +113,19 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
         <ScrollReveal variant="fade-up" delay={200} duration={650}>
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-median-taupe/70 gap-4">
             <p>
-              &copy; {new Date().getFullYear()} NCloud Digital. Haute Growth Architecture &bull; Colombo &bull; Operating Globally.
+              © 2026 NCloud Digital Studio. A contemporary digital innovation agency experience.
             </p>
 
             <div className="flex items-center gap-6">
               <button
                 onClick={() => {
-                  navigate('/work');
+                  navigate('/style-guide');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 data-cursor="pointer"
                 className="hover:text-black underline decoration-median-taupe transition-colors"
               >
-                Case Studies
+                Style Guide
               </button>
               <span>•</span>
               <button
@@ -134,7 +136,7 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
                 data-cursor="pointer"
                 className="hover:text-black underline decoration-median-taupe transition-colors"
               >
-                Growth Packages
+                Licensing & Pricing
               </button>
               <span>•</span>
               <button
@@ -146,17 +148,6 @@ export const Footer: React.FC<FooterProps> = ({ navigate }) => {
                 className="hover:text-black underline decoration-median-taupe transition-colors"
               >
                 About Studio
-              </button>
-              <span>•</span>
-              <button
-                onClick={() => {
-                  navigate('/style-guide');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                data-cursor="pointer"
-                className="hover:text-black underline decoration-median-taupe transition-colors"
-              >
-                Design System
               </button>
             </div>
           </div>

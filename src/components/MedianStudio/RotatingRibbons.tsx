@@ -1,55 +1,59 @@
 import React from 'react';
 
-export const RotatingRibbons: React.FC = () => {
+interface RotatingRibbonsProps {
+  navigate?: (route: string) => void;
+}
+
+export const RotatingRibbons: React.FC<RotatingRibbonsProps> = ({ navigate }) => {
+  const repeatedText = Array(12).fill('CONTACT US');
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (navigate) {
+      navigate('/contact');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="relative w-full py-12 overflow-hidden bg-median-taupe text-white select-none">
-      {/* Top Tilted Marquee (Left to Right) */}
-      <div className="w-[120%] -ml-[10%] -rotate-2 bg-black py-4 border-y border-white/20 shadow-xl overflow-hidden flex">
-        <div className="flex shrink-0 animate-marquee-left items-center space-x-12 whitespace-nowrap">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="flex items-center space-x-12">
-              <span className="font-oswald text-2xl sm:text-3xl font-bold tracking-widest uppercase">
-                PERFORMANCE MARKETING
+    <div className="relative py-28 md:py-36 overflow-hidden select-none bg-white">
+      {/* Background Ribbon 2: Rotated +6deg with lower opacity */}
+      <div
+        onClick={handleClick}
+        data-cursor="pointer"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] bg-median-taupe/40 text-white py-4 md:py-6 flex items-center cursor-pointer shadow-lg transition-transform duration-500 hover:scale-105"
+        style={{
+          transform: 'translate(-50%, -50%) rotate(6deg) scale(1.15)',
+        }}
+      >
+        <div className="flex whitespace-nowrap animate-marquee-right">
+          {[...repeatedText, ...repeatedText].map((text, idx) => (
+            <div key={idx} className="flex items-center">
+              <span className="font-oswald text-4xl sm:text-6xl md:text-7xl font-bold uppercase tracking-tight mx-4 text-white">
+                {text}
               </span>
-              <span className="text-median-taupe text-xl">✦</span>
-              <span className="font-oswald text-2xl sm:text-3xl font-bold tracking-widest uppercase">
-                WEB ENGINEERING
-              </span>
-              <span className="text-median-taupe text-xl">✦</span>
-              <span className="font-oswald text-2xl sm:text-3xl font-bold tracking-widest uppercase">
-                4.8X BLENDED ROAS
-              </span>
-              <span className="text-median-taupe text-xl">✦</span>
-              <span className="font-oswald text-2xl sm:text-3xl font-bold tracking-widest uppercase">
-                SUB-1.2S LOAD SPEED
-              </span>
-              <span className="text-median-taupe text-xl">✦</span>
+              <span className="w-3 h-3 rounded-full bg-white mx-3 inline-block" />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Bottom Counter-Tilted Marquee (Right to Left) */}
-      <div className="w-[120%] -ml-[10%] rotate-2 bg-median-taupe-dark py-4 border-y border-white/20 shadow-xl -mt-4 overflow-hidden flex">
-        <div className="flex shrink-0 animate-marquee-right items-center space-x-12 whitespace-nowrap">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="flex items-center space-x-12">
-              <span className="font-oswald text-2xl sm:text-3xl font-bold tracking-widest uppercase text-white/90">
-                NCLOUD DIGITAL
+      {/* Foreground Ribbon 1: Rotated -6deg in solid Median Bronze */}
+      <div
+        onClick={handleClick}
+        data-cursor="pointer"
+        className="relative z-10 w-[140vw] -left-[20vw] bg-median-taupe text-white py-5 md:py-7 flex items-center cursor-pointer shadow-2xl transition-all duration-500 hover:scale-[1.18] group"
+        style={{
+          transform: 'rotate(-6deg) scale(1.15)',
+        }}
+      >
+        <div className="flex whitespace-nowrap animate-marquee-left group-hover:[animation-play-state:paused]">
+          {[...repeatedText, ...repeatedText].map((text, idx) => (
+            <div key={idx} className="flex items-center">
+              <span className="font-oswald text-4xl sm:text-6xl md:text-7xl font-bold uppercase tracking-tight mx-4 text-white drop-shadow-sm">
+                {text}
               </span>
-              <span className="text-white/40 text-xl">★</span>
-              <span className="font-oswald text-2xl sm:text-3xl font-bold tracking-widest uppercase text-white/90">
-                SRI LANKA &bull; DUBAI &bull; LONDON
-              </span>
-              <span className="text-white/40 text-xl">★</span>
-              <span className="font-oswald text-2xl sm:text-3xl font-bold tracking-widest uppercase text-white/90">
-                STRATEGY BEFORE DESIGN
-              </span>
-              <span className="text-white/40 text-xl">★</span>
-              <span className="font-oswald text-2xl sm:text-3xl font-bold tracking-widest uppercase text-white/90">
-                SERVER-SIDE CAPI PIXEL
-              </span>
-              <span className="text-white/40 text-xl">★</span>
+              <span className="w-3.5 h-3.5 rounded-full bg-white mx-3 inline-block" />
             </div>
           ))}
         </div>

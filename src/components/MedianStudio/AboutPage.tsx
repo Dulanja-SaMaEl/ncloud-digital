@@ -1,6 +1,7 @@
 import React from 'react';
-import { TEAM_MEMBERS, FAQS, STUDIO_OFFICES } from './siteData';
-import { ScrollReveal } from './ScrollReveal';
+import { TEAM_MEMBERS } from './siteData';
+import { RotatingRibbons } from './RotatingRibbons';
+import { ScrollReveal, StaggerContainer, CountingNumber } from './ScrollReveal';
 
 interface AboutPageProps {
   navigate: (route: string) => void;
@@ -8,163 +9,220 @@ interface AboutPageProps {
 
 export const AboutPage: React.FC<AboutPageProps> = ({ navigate }) => {
   return (
-    <div className="pt-28 pb-24 bg-white text-median-taupe min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        {/* Page Header */}
-        <div className="py-12 border-b border-median-taupe/20 mb-16">
-          <ScrollReveal variant="badge-drop">
-            <span className="text-xs font-bold tracking-widest uppercase text-median-taupe/70 block mb-2 font-mono">
-              // ABOUT NCLOUD DIGITAL STUDIO
+    <div className="pt-32 pb-16 bg-white text-median-taupe">
+      {/* Hero Header */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 mb-20">
+        <ScrollReveal variant="scale-up" duration={900}>
+          <div className="border border-median-taupe/20 rounded-2xl p-8 sm:p-16 relative bg-median-taupe/5">
+            {/* Corner markers */}
+            <span className="absolute -top-2.5 -left-2.5 w-5 h-5 border-2 border-median-taupe bg-white shadow-sm" />
+            <span className="absolute -top-2.5 -right-2.5 w-5 h-5 border-2 border-median-taupe bg-white shadow-sm" />
+            <span className="absolute -bottom-2.5 -left-2.5 w-5 h-5 border-2 border-median-taupe bg-white shadow-sm" />
+            <span className="absolute -bottom-2.5 -right-2.5 w-5 h-5 border-2 border-median-taupe bg-white shadow-sm" />
+
+            <span className="text-xs font-bold tracking-widest uppercase text-median-taupe block mb-4">
+              Studio Identity & Manifesto
+            </span>
+            <h1 className="font-oswald text-5xl sm:text-7xl md:text-8xl font-bold uppercase tracking-tight text-black leading-none mb-6">
+              About Median
+            </h1>
+            <p className="text-sm sm:text-lg text-black/85 max-w-2xl font-normal leading-relaxed">
+              We are an independent creative agency and digital innovation studio dedicated to high-craft typography, spatial UI hierarchy, and performance-first web development.
+            </p>
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* Metrics Grid with Animated Counters */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 mb-24">
+        <StaggerContainer
+          staggerDelay={140}
+          variant="scale-up"
+          duration={800}
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
+        >
+          {[
+            { num: 14, suffix: '', label: 'International Design Honors' },
+            { num: 120, suffix: '+', label: 'Delivered Flagship Systems' },
+            { num: 99, suffix: '%', label: 'Long-Term Client Retention' },
+            { num: 8, suffix: '', label: 'Years of Creative Engineering' },
+          ].map((metric, idx) => (
+            <div
+              key={idx}
+              className="p-8 rounded-2xl border border-median-taupe/20 bg-white shadow-sm hover:border-median-taupe transition-all group"
+            >
+              <div className="font-oswald text-5xl sm:text-6xl font-bold text-median-taupe mb-2 group-hover:scale-105 transition-transform">
+                <CountingNumber value={metric.num} suffix={metric.suffix} duration={1600} />
+              </div>
+              <div className="text-xs font-semibold uppercase text-black">
+                {metric.label}
+              </div>
+            </div>
+          ))}
+        </StaggerContainer>
+      </section>
+
+      {/* Story & Philosophy */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 mb-28 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="lg:col-span-6 space-y-6">
+          <ScrollReveal variant="fade-down" duration={700}>
+            <span className="px-4 py-1.5 rounded-full border border-median-taupe text-xs font-bold tracking-widest uppercase inline-block">
+              Our Foundation
             </span>
           </ScrollReveal>
-          <ScrollReveal variant="split-mask" delay={100}>
-            <h1 className="font-oswald text-5xl sm:text-7xl font-bold uppercase tracking-tight text-black mb-6">
-              Engineering Digital Growth
-            </h1>
+
+          <ScrollReveal variant="fade-up" delay={100} duration={800}>
+            <h2 className="font-oswald text-4xl sm:text-5xl font-bold uppercase text-black leading-tight">
+              Digital Visual Mastery
+            </h2>
           </ScrollReveal>
-          <ScrollReveal variant="blur-focus" delay={180}>
-            <p className="text-sm sm:text-base text-median-taupe/90 max-w-2xl font-normal leading-relaxed">
-              Founded by Nethum Vidyalankara (Dulan), NCloud Digital is a performance digital marketing agency and modern web engineering studio operating out of Colombo, Sri Lanka, with global hubs in Dubai and London.
+
+          <ScrollReveal variant="fade-up" delay={200} duration={800}>
+            <p className="text-sm sm:text-base text-black/80 font-normal leading-relaxed">
+              Founded with the belief that modern software should feel tactile, editorial, and weightless, Median bridges the gap between Swiss typographic restraint and fluid motion graphics.
             </p>
+          </ScrollReveal>
+
+          <ScrollReveal variant="fade-up" delay={300} duration={800}>
+            <p className="text-sm sm:text-base text-black/80 font-normal leading-relaxed">
+              Every project begins by peeling back unnecessary fluff. We eliminate AI slop, bloated script libraries, and generic templates to architect timeless digital assets.
+            </p>
+          </ScrollReveal>
+
+          <ScrollReveal variant="fade-up" delay={400} duration={800}>
+            <div className="pt-4">
+              <button
+                onClick={() => {
+                  navigate('/contact');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                data-cursor="pointer"
+                className="px-8 py-4 rounded-full bg-median-taupe hover:bg-black text-white text-xs font-bold tracking-widest uppercase transition-all shadow-md"
+              >
+                Partner with Median
+              </button>
+            </div>
           </ScrollReveal>
         </div>
 
-        {/* Studio Story Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-24">
-          <ScrollReveal variant="curtain-expand" duration={950} className="lg:col-span-6">
-            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-median-taupe/20 bg-median-taupe/10 shadow-xl">
+        <div className="lg:col-span-6">
+          <ScrollReveal variant="fade-left" delay={250} duration={900}>
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-median-taupe/20 shadow-2xl bg-median-taupe/10">
               <img
-                src="/ncloud-director.jpg"
-                alt="NCloud Digital Studio Headquarters"
-                className="w-full h-full object-cover"
+                src="/assets/photo-1.jpg"
+                alt="Median Studio Workspace"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
             </div>
           </ScrollReveal>
+        </div>
+      </section>
 
-          <ScrollReveal variant="card-flip-right" delay={140} duration={950} className="lg:col-span-6 space-y-6">
-            <span className="text-xs font-bold uppercase tracking-wider text-median-taupe/70 block font-mono">
-              The Architecture Behind The Results
+      {/* Pillars with Staggered Entrance */}
+      <section className="bg-median-taupe/5 py-24 border-y border-median-taupe/20 mb-28">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <ScrollReveal variant="fade-up" duration={800} className="text-center max-w-xl mx-auto mb-16">
+            <span className="text-xs font-bold tracking-widest uppercase text-median-taupe/70 block mb-2">
+              Our Methodology
             </span>
-            <h2 className="font-oswald text-3xl sm:text-4xl font-bold uppercase text-black leading-tight">
-              We build systems that turn digital attention into predictable commercial revenue.
+            <h2 className="font-oswald text-4xl sm:text-5xl font-bold uppercase text-black">
+              Three Guiding Pillars
             </h2>
-            <p className="text-xs sm:text-sm text-median-taupe/80 leading-relaxed font-normal">
-              Traditional agencies operate in silos: designers don’t understand conversion metrics, and media buyers don’t understand software architecture. We fused both disciplines. Every design token is calibrated for psychological persuasion, every website is engineered for sub-1.2s speed, and every ad dollar is tied directly to pipeline through server-side Conversion API tracking.
-            </p>
-            <p className="text-xs sm:text-sm text-median-taupe/80 leading-relaxed font-normal">
-              Whether you are an ambitious e-commerce brand scaling to eight figures, or a luxury hospitality group bypassing OTA commissions, our studio provides direct founder stewardship from preliminary audit to global rollout.
-            </p>
-            <div className="pt-2">
-              <a
-                href="https://wa.me/94760967884"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-median-taupe hover:bg-black text-white text-xs font-bold uppercase tracking-widest transition-colors shadow-md"
+          </ScrollReveal>
+
+          <StaggerContainer
+            staggerDelay={160}
+            variant="scale-up"
+            duration={850}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
+            {[
+              {
+                num: '01',
+                title: 'Human-Centered Emotion',
+                desc: 'Technology is cold until human intuition guides the pen. We create interfaces that evoke tactile joy, confidence, and calm.',
+              },
+              {
+                num: '02',
+                title: 'Zero-Lag Engineering',
+                desc: 'Speed is UX. We adhere to 60fps animations, 99+ Core Web Vitals, and lightweight component structures without bloated third-party trackers.',
+              },
+              {
+                num: '03',
+                title: 'Commercial Longevity',
+                desc: 'We do not chase fleeting micro-trends. We engineer cohesive visual languages that remain fresh and authoritative for years.',
+              },
+            ].map((pillar) => (
+              <div
+                key={pillar.num}
+                className="p-8 sm:p-10 rounded-2xl bg-white border border-median-taupe/20 hover:border-median-taupe transition-all shadow-sm flex flex-col justify-between h-full"
               >
-                <span>Direct WhatsApp Consultation</span>
-                <span>&rarr;</span>
-              </a>
-            </div>
+                <div>
+                  <span className="w-10 h-10 rounded-full border border-median-taupe text-xs font-bold flex items-center justify-center text-median-taupe mb-6">
+                    {pillar.num}
+                  </span>
+                  <h3 className="font-oswald text-2xl font-bold uppercase text-black mb-3">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-black/75 font-normal leading-relaxed">
+                    {pillar.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </StaggerContainer>
+        </div>
+      </section>
+
+      {/* Full Team Directory */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 mb-28">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-16 gap-4">
+          <ScrollReveal variant="fade-up" duration={800}>
+            <span className="text-xs font-bold tracking-widest uppercase text-median-taupe/70 block mb-2">
+              The Minds Behind Median
+            </span>
+            <h2 className="font-oswald text-4xl sm:text-6xl font-bold uppercase tracking-tight text-black">
+              The Team
+            </h2>
           </ScrollReveal>
         </div>
 
-        {/* Global Studio Hubs */}
-        <div className="py-16 border-t border-median-taupe/20 mb-24">
-          <div className="text-center max-w-xl mx-auto mb-12">
-            <span className="text-xs font-bold tracking-widest uppercase text-median-taupe/70 block mb-2 font-mono">
-              // PHYSICAL PRESENCE &bull; GLOBAL DELIVERY
-            </span>
-            <h2 className="font-oswald text-3xl sm:text-4xl font-bold uppercase text-black">
-              Studio Operating Hubs
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {STUDIO_OFFICES.map((office, idx) => (
-              <ScrollReveal key={office.city} variant="card-lift" delay={idx * 120}>
-                <div className="p-8 rounded-2xl bg-median-cream border border-median-taupe/20 space-y-3">
-                  <span className="font-oswald text-2xl font-bold uppercase text-black block border-b border-median-taupe/30 pb-2">
-                    {office.city}
-                  </span>
-                  <p className="text-xs text-median-taupe/80 leading-relaxed">
-                    {office.address}
-                    <br />
-                    {office.region}
-                  </p>
-                  <a
-                    href={`tel:${office.phone.replace(/\s+/g, '')}`}
-                    className="text-xs font-mono font-bold text-black hover:text-median-taupe block pt-2"
-                  >
-                    {office.phone}
-                  </a>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-
-        {/* Leadership Team */}
-        <div className="py-16 border-t border-median-taupe/20 mb-24">
-          <div className="mb-12">
-            <span className="text-xs font-bold tracking-widest uppercase text-median-taupe/70 block mb-2 font-mono">
-              // THE LEADERSHIP
-            </span>
-            <h2 className="font-oswald text-3xl sm:text-5xl font-bold uppercase text-black">
-              Meet The Founders
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {TEAM_MEMBERS.map((m, idx) => (
-              <ScrollReveal key={m.id} variant="card-flip-left" delay={idx * 130}>
-                <div className="p-8 rounded-2xl border border-median-taupe/20 bg-white space-y-4 h-full flex flex-col justify-between">
-                  <div>
-                    <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-median-taupe/10 mb-6">
-                      <img src={m.image} alt={m.name} className="w-full h-full object-cover" />
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-median-cream text-median-taupe text-[10px] font-bold font-mono uppercase tracking-wider border border-median-taupe/30 inline-block mb-2">
-                      {m.role}
-                    </span>
-                    <h3 className="font-oswald text-2xl font-bold uppercase text-black mb-2">
-                      {m.name}
-                    </h3>
-                    <p className="text-xs text-median-taupe/80 leading-relaxed">
-                      {m.bio}
-                    </p>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-
-        {/* FAQs */}
-        <div className="py-16 border-t border-median-taupe/20">
-          <div className="max-w-3xl mx-auto space-y-6">
-            <div className="text-center mb-10">
-              <span className="text-xs font-bold tracking-widest uppercase text-median-taupe/70 block mb-2 font-mono">
-                // COMMON QUESTIONS
+        <StaggerContainer
+          staggerDelay={160}
+          variant="scale-up"
+          duration={850}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          {TEAM_MEMBERS.map((member) => (
+            <div
+              key={member.id}
+              className="p-8 rounded-2xl bg-white border border-median-taupe/20 hover:border-median-taupe transition-all shadow-sm h-full"
+            >
+              <div className="aspect-[4/5] rounded-xl overflow-hidden mb-6 bg-median-taupe/10 border border-median-taupe/15">
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <h3 className="font-oswald text-2xl font-bold uppercase text-black">
+                {member.name}
+              </h3>
+              <span className="text-xs font-semibold text-median-taupe uppercase block mt-1">
+                {member.role}
               </span>
-              <h2 className="font-oswald text-3xl sm:text-4xl font-bold uppercase text-black">
-                Everything You Need to Know
-              </h2>
+              <p className="text-xs text-black/75 font-normal leading-relaxed mt-3">
+                {member.bio}
+              </p>
             </div>
+          ))}
+        </StaggerContainer>
+      </section>
 
-            {FAQS.map((faq, i) => (
-              <ScrollReveal key={i} variant="blur-focus" delay={i * 80}>
-                <div className="p-6 rounded-2xl border border-median-taupe/20 bg-median-cream space-y-2">
-                  <h4 className="font-oswald text-lg font-bold uppercase text-black">
-                    {faq.question}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-median-taupe/80 leading-relaxed font-normal">
-                    {faq.answer}
-                  </p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Rotating Ribbons Banner */}
+      <ScrollReveal variant="scale-up" duration={1000}>
+        <RotatingRibbons navigate={navigate} />
+      </ScrollReveal>
     </div>
   );
 };
