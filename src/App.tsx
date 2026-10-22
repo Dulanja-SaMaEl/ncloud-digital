@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import JackPortfolio from './components/JackPortfolio/JackPortfolio';
 import HaloLanding from './components/HaloLanding/HaloLanding';
+import MedianStudio from './components/MedianStudio/MedianStudio';
 import { 
   Zap, ArrowRight, ArrowUpRight, CheckCircle2, ShieldCheck, 
   Clock, Sparkles, MonitorSmartphone, Megaphone, Video, Share2, 
@@ -62,7 +63,7 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
 };
 
 // --- Navbar Component ---
-const Navbar: React.FC<{ onOpenClientHub: () => void }> = ({ onOpenClientHub }) => {
+const Navbar: React.FC<{ onOpenClientHub: () => void; onSwitchToMedian?: () => void }> = ({ onOpenClientHub, onSwitchToMedian }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -113,10 +114,31 @@ const Navbar: React.FC<{ onOpenClientHub: () => void }> = ({ onOpenClientHub }) 
               {link.name}
             </a>
           ))}
+          {onSwitchToMedian && (
+            <button
+              onClick={onSwitchToMedian}
+              className="text-xs uppercase tracking-wider font-semibold px-3 py-1.5 text-white bg-gradient-to-r from-[#9F8170] to-[#b59b8c] hover:opacity-90 rounded-full transition-all duration-200 shadow-sm ml-1"
+            >
+              Editorial Edition
+            </button>
+          )}
         </nav>
 
         {/* Action Controls */}
         <div className="hidden md:flex items-center gap-3">
+          {onSwitchToMedian && (
+            <motion.button
+              whileHover={{ scale: 1.03, y: -1 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 450, damping: 25 }}
+              onClick={onSwitchToMedian}
+              className="hidden xl:flex items-center gap-2 px-3.5 py-2 rounded-full border border-[#9F8170]/60 bg-[#9F8170]/15 hover:bg-[#9F8170]/30 text-xs font-semibold text-[#b59b8c] hover:text-white transition-all shadow-sm cursor-pointer"
+            >
+              <Sparkles size={14} className="text-[#b59b8c]" />
+              <span>Editorial Studio</span>
+            </motion.button>
+          )}
+
           <motion.button
             whileHover={{ scale: 1.03, y: -1 }}
             whileTap={{ scale: 0.97 }}
@@ -172,6 +194,17 @@ const Navbar: React.FC<{ onOpenClientHub: () => void }> = ({ onOpenClientHub }) 
                 </a>
               ))}
               <div className="pt-4 flex flex-col gap-3">
+                {onSwitchToMedian && (
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onSwitchToMedian();
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-[#9F8170]/40 bg-[#9F8170]/20 text-[#b59b8c] font-semibold text-sm cursor-pointer"
+                  >
+                    <Sparkles size={16} /> Haute Editorial Studio Edition
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
@@ -1651,9 +1684,10 @@ const FloatingWhatsApp: React.FC = () => {
 
 // --- Main Application Component ---
 export default function App() {
-  const [activeView, setActiveView] = useState<'jack' | 'ncloud' | 'halo'>(() => {
+  const [activeView, setActiveView] = useState<'jack' | 'ncloud' | 'halo' | 'median'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'median' || window.location.hash.startsWith('#median')) return 'median';
       if (params.get('view') === 'halo' || window.location.hash.startsWith('#halo')) return 'halo';
       if (params.get('view') === 'jack' || window.location.hash.startsWith('#jack')) return 'jack';
       if (params.get('view') === 'ncloud' || window.location.hash.startsWith('#ncloud')) return 'ncloud';
@@ -1667,6 +1701,8 @@ export default function App() {
       document.title = 'NCloud Digital | 3D Experience & Growth Systems';
     } else if (activeView === 'halo') {
       document.title = 'Halo / USD Halo — The Automated Digital Dollar';
+    } else if (activeView === 'median') {
+      document.title = 'NCloud Digital | Haute Editorial Studio Experience';
     } else {
       document.title = 'NCloud Digital | Premium Digital Marketing & Web Development Agency';
     }
@@ -1707,17 +1743,32 @@ export default function App() {
               : 'text-zinc-400 hover:text-white'
           }`}
         >
-          Halo (NCloud Fintech)
+          Halo (Fintech)
+        </button>
+        <button
+          onClick={() => setActiveView('median')}
+          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 font-semibold cursor-pointer ${
+            activeView === 'median'
+              ? 'bg-[#9F8170] text-white shadow-md'
+              : 'text-zinc-400 hover:text-white'
+          }`}
+        >
+          Haute Editorial
         </button>
       </aside>
 
-      {activeView === 'halo' ? (
+      {activeView === 'median' ? (
+        <MedianStudio onSwitchView={setActiveView} />
+      ) : activeView === 'halo' ? (
         <HaloLanding />
       ) : activeView === 'jack' ? (
         <JackPortfolio />
       ) : (
         <div className="bg-[#08090B] min-h-screen text-[#F5F7FA] font-sans antialiased overflow-x-hidden selection:bg-cyan-400/30 selection:text-cyan-300">
-          <Navbar onOpenClientHub={() => setClientHubOpen(true)} />
+          <Navbar
+            onOpenClientHub={() => setClientHubOpen(true)}
+            onSwitchToMedian={() => setActiveView('median')}
+          />
           
           <main>
             <HeroSection />
